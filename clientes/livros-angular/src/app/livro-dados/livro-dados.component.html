@@ -1,0 +1,26 @@
+<main class="container col-9">
+    <h1 class="mt-2">Dados do Livro</h1>
+    <form (submit)="incluir()" ngNativeValidate>
+        <div class="form-group mb-2">
+            <label for="titulo">Título</label>
+            <input type="text" name="titulo" id="titulo" class="form-control" required [(ngModel)]="livro.titulo">
+        </div>
+        <div class="form-group mb-2">
+            <label for="resumo">Resumo</label>
+            <textarea name="resumo" id="resumo" rows="3" class="form-control" [(ngModel)]="livro.resumo"></textarea>
+        </div>
+        <div class="form-group mb-2">
+            <label for="editora">Editora</label>
+            <select name="editora" id="editora" class="form-control" required [(ngModel)]="livro.codEditora">
+                <option *ngFor="let editora of editoras" [value]="editora.codEditora">
+                    {{ editora.nome }}
+                </option>
+            </select>
+        </div>
+        <div class="form-group mb-2">
+            <label for="autores">Autores</label>
+            <textarea name="autores" id="autores" rows="3" class="form-control" [(ngModel)]="autoresForm"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Salvar Dados</button>
+    </form>
+</main>
