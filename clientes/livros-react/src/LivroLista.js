@@ -28,19 +28,16 @@ export default function LivroLista() {
     const [carregado, setCarregado] = useState (false);
 
     useEffect(() => {
-        if (!carregado) {
-            const controladorLivros = new ControleLivros();
-            const livrosCarregados = controladorLivros.obterLivros();
-            setLivros(livrosCarregados);
+        controleLivros.obterLivros().then((livrosObtidos) => {
+            setLivros(livrosObtidos);
             setCarregado(true);
-        }
-    }, [carregado]);
+        });
+    }, []);
 
-    const excluir = (codigoLivro) => {
-        const controladorLivros = new ControleLivros();
-        controladorLivros.excluir(codigoLivro);
-
+    const excluir = async (codigo) => {
         setCarregado(false);
+        await controleLivros.excluir(codigo);
+        setCarregado(true);
     };
 
     return (
@@ -57,7 +54,10 @@ export default function LivroLista() {
                 </thead>
                 <tbody>
                     {livros.map((livro) => (
-                        <LinhaLivro key={livro.codigo} livro={livro} excluir={excluir} />
+                        <LinhaLivro 
+                        key={livro.codigo} 
+                        livro={livro} 
+                        excluir={excluir} />
                     ))}
                 </tbody>
             </table>

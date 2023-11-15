@@ -23,9 +23,7 @@ const LivroDados = () => {
         setCodEditora(Number(event.target.value));
     };
 
-    const incluir = (event) => {
-        event.preventDefault();
-        
+    const incluir = async () => {
         const novoLivro = {
             codigo: 0,
             titulo,
