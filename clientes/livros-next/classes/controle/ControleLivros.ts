@@ -1,29 +1,62 @@
 import Livro from '../modelo/Livro';
+import axios, { AxiosResponse } from 'axios';
 
-const livros: Array<Livro> = [
-    new Livro(1, 1, 'Use a Cabeça: Java', 'Use a Cabeça! Java é uma experiência completa de aprendizado em programação orientada a objetos (OO) e Java.', ['Bert Bates', 'Kathy Sierra']),
-    new Livro(2, 2, 'Java como Programar', 'Milhões de alunos e profissionais aprenderam programação e desenvolvimento de software com os livros Deitel', ['Paul Deitel', 'Harvey Deitel']),
-    new Livro(3, 3, 'Core Java for the Impatient', 'Eaders familiar with Horstmanns original, two-volume "Core Java" books who are looking for a comprehensive, but condensed guide to all of the new features and functions of Java SE 9 will learn how these new features impact the language and core libraries.', ['Cay Horstmann'])
-];
+const baseURL = 'http://localhost:3030/livros';
 
-class ControleLivro {
-    obterLivros(): Array<Livro> {
-        return livros;
-    }
-
-    incluir(novoLivro: Livro): void {
-        const codigos = livros.map(livro => livro.codigo);
-        const novoCodigo = codigos.length > 0 ? Math.max(...codigos) + 1 : 1;
-        novoLivro.codigo = novoCodigo;
-        livros.push(novoLivro);
-    }
-
-    excluir(codigoLivro: number): void {
-        const index = livros.findIndex(livro => livro.codigo === codigoLivro);
-        if (index !== -1) {
-            livros.splice(index, 1);
-        }
-    }
+interface LivroMongo {
+    _id: String | null;
+    codEditora: number;
+    titulo: String;
+    resumo: String;
+    autores: [String];
 }
 
-export default ControleLivro
+class ControleLivro {
+    async obterLivros(): Promise<Livro[]> {
+        try {
+            const response: AxiosResponse<LivroMongo[]> = await axios.get(baseURL);
+            return Response.data.map((livroMongo) => ({
+                _id: livroMongo._id, 
+                codEditora: livroMongo.codEditora, 
+                titulo: livroMongo.titulo, 
+                resumo: livroMongo.resumo, autores: livroMongo.autores}))
+        } catch (error) {
+            console.error('Erro ao obter livros:', error);
+            return [];
+        }
+    };
+
+    async incluir(livro: Livro): Promise<boolean> {
+        try {
+          const livroMongo: LivroMongo = {
+              _id: livro._id,
+              codEditora: 0,
+              titulo: undefined,
+              resumo: undefined,
+              autores: []
+          };
+          const response: AxiosResponse = await axios.post(baseURL, livroMongo, {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
+          return response.ok;
+        } catch (error) {
+          console.error('Erro ao incluir livro:', error);
+          return false;
+        }
+    };
+    
+    async excluir(codigo: string): Promise<boolean> {
+        try {
+          const response: AxiosResponse = await axios.delete(`${baseURL}/${codigo}`);
+          return response.ok;
+        } catch (error) {
+          console.error('Erro ao excluir livro:', error);
+          return false;
+        }
+      };
+};
+
+
+export default ControleLivro;
