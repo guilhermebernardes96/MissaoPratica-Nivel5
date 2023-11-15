@@ -1,6 +1,7 @@
 var banco = require('./conexao');
+
 var LivroSchema = banco.Schema;
-var livroSchema = new LivroSchema({
+var livroSchema =  new LivroSchema({
     _id: banco.Schema.Types.ObjectId,
     titulo: String,
     codEditora: Number,
