@@ -6,31 +6,40 @@ import Livro from './livro';
 })
 
 export class ControleLivrosService {
-  livros: Array<Livro>;
+  private baseURL = 'http://localhost:3030/livros';
 
-  constructor() {
-    this.livros = [
-      new Livro(1, 'Use a Cabeça: Java', 'Use a Cabeça! Java é uma experiência completa de aprendizado em programação orientada a objetos (OO) e Java.', ['Bert Bates', 'Kathy Sierra'], 1),
-      new Livro(2, 'Java como Programar', 'Milhões de alunos e profissionais aprenderam programação e desenvolvimento de software com os livros Deitel', ['Paul Deitel', 'Harvey Deitel'], 2),
-      new Livro(3, 'Core Java for the Impatient', 'Eaders familiar with Horstmanns original, two-volume "Core Java" books who are looking for a comprehensive, but condensed guide to all of the new features and functions of Java SE 9 will learn how these new features impact the language and core libraries.', ['Cay Horstmann'], 3)
-    ];
-  };
+  obterLivros(): Promise<Livro[]> {
+    return fetch(this.baseURL)
+      .then((response) => response.json())
+      .then((data: LivroMongo[]) =>
+        data.map((livroMongo) => ({
+          codigo: livroMongo._id,
+          titulo: livroMongo.titulo,
+          autor: livroMongo.autor,
+          ano: livroMongo.ano,
+        }))
+      );
+  }
 
-  obterLivros(): Array<Livro> {
-    return this.livros;
-  };
+  excluir(codigo: string): Promise<boolean> {
+    return fetch(`${this.baseURL}/${codigo}`, { method: 'DELETE' })
+      .then((response) => response.ok);
+  }
 
-  incluir(novoLivro: Livro): void {
-    const codigos = this.livros.map(livro => livro.codigo);
-      const novoCodigo = codigos.length > 0 ? Math.max(...codigos) + 1 : 1;
-      novoLivro.codigo = novoCodigo;
-      this.livros.push(novoLivro);
-  };
-
-  excluir(codigoLivro: number): void {
-    const index = this.livros.findIndex(livro => livro.codigo === codigoLivro);
-    if (index !== -1) {
-      this.livros.splice(index, 1);
+  incluir(livro: Livro): Promise<boolean> {
+    const livroMongo: LivroMongo = {
+      _id: '',
+      titulo: livro.titulo,
+      autor: livro.autor,
+      ano: livro.ano,
     };
-  };
+
+    return fetch(this.baseURL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(livroMongo),
+    }).then((response) => response.ok);
+  }
 }

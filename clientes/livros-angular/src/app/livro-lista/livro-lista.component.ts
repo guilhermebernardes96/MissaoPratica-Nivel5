@@ -10,8 +10,12 @@ import { ControleLivrosService } from '../controle-livros.service';
   styleUrls: ['./livro-lista.component.css']
 })
 export class LivroListaComponent implements OnInit {
+obterNome(arg0: number) {
+throw new Error('Method not implemented.');
+}
   public editora: Array<Editora> = [];
   public livros: Array<Livro> = [];
+  controleLivros: any;
 
   constructor(
     private servEditora: ControleEditoraService,
@@ -19,17 +23,17 @@ export class LivroListaComponent implements OnInit {
   ) {}
   
   ngOnInit(): void {
-    this.editora = this.servEditora.getEditoras();
-    this.livros = this.servLivros.obterLivros();
+    this.controleLivros.obterLivros().then((livros: Livro[]) => {
+      this.livros = livros;
+    });
   };
 
-  excluir = (codigoLivro: number): void => {
-    this.servLivros.excluir(codigoLivro);
-    this.livros = this.servLivros.obterLivros();
-  };
-
-  obterNome(codEditora: number): string {
-    return this.servEditora.getNomeEditora(codEditora) || 'Editora não encontrada';
+  excluir(codigo: string): void {
+    this.controleLivros.excluir(codigo).then(() => {
+      this.controleLivros.obterLivros().then((livros: Livro[]) => {
+        this.livros = livros;
+      });
+    });
   };
 
 }

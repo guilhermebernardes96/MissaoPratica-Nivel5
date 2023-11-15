@@ -14,22 +14,23 @@ export class LivroDadosComponent implements OnInit {
   public livro: Livro;
   public autoresForm: string = "";
   public editoras: Array<Editora> = [];
+  controleLivros: any;
 
   constructor (
     private servEditora: ControleEditoraService,
     private servLivros: ControleLivrosService,
     private router: Router
   ) { 
-      this.livro = new Livro(1, "", "", [], 0);
+      this.livro = new Livro("", "", "", [], 0);
    };
 
   ngOnInit(): void {
     this.editoras = this.servEditora.getEditoras();
   }
 
-  incluir = () => {
-    this.livro.autores = this.autoresForm.split("\n");
-    this.servLivros.incluir(this.livro);
-    this.router.navigateByUrl("/lista")
+  incluir(livro: any): void {
+    this.controleLivros.incluir(livro).then(() => {
+      this.router.navigateByUrl('/lista');
+    });
   }
 }
